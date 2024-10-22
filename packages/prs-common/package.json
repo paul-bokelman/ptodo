@@ -1,0 +1,17 @@
+{
+  "name": "prs-common",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {},
+  "dependencies": {
+    "http-status-codes": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.2",
+    "ts-node": "^10.9.1",
+    "tsconfig": "*",
+    "typescript": "^4.5.2"
+  }
+}

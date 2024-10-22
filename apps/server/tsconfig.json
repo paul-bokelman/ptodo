@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "NodeNext",
+    "skipLibCheck": true,
+    "strict": true
+    // "paths": {
+    //   "@/*": ["./src/*"]
+    // }
+  }
+}
