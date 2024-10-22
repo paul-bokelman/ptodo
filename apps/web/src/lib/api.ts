@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ControllerConfig, GetDay, DeleteTask, UpdateTask, CreateTask, ImportRoutine } from "prs-common";
+import { ControllerConfig, GetDay, DeleteTask, UpdateTask, CreateTask, ImportRoutine } from "ptodo-common";
 import { QueryClient } from "react-query";
 
 export const qc = new QueryClient();

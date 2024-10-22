@@ -1,4 +1,4 @@
-import type { Controller, GetDay } from "prs-common";
+import type { Controller, GetDay } from "ptodo-common";
 import { StatusCodes } from "http-status-codes";
 import dayjs from "dayjs";
 import { prisma } from "../../../config";

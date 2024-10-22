@@ -1,14 +1,13 @@
 import * as React from "react";
-import type { GetDay, ServerError, UpdateTask, DeleteTask } from "prs-common";
+import type { GetDay, ServerError, UpdateTask, DeleteTask } from "ptodo-common";
 import cn from "clsx";
 import { useMutation } from "react-query";
 import { TaskMode } from "@/types";
 import { UpdateTaskDialog } from "@/components/dialog";
 import { useToast } from "@/components/ui";
 import { Circle, CheckCircle2, Pencil, Trash2 } from "lucide-react";
-import { api } from "@/lib/api";
+import { qc, api } from "@/lib/api";
 import { sfx } from "@/lib/sfx";
-import { usePRS } from "@/components";
 
 type Props = GetDay["payload"]["tasks"][number] & {
   selected?: boolean;
@@ -17,7 +16,6 @@ type Props = GetDay["payload"]["tasks"][number] & {
 
 export const Task: React.FC<Props> = ({ mode, selected, ...task }) => {
   const { toast } = useToast();
-  const { revalidateContext } = usePRS();
   const [updateDialogOpen, setUpdateDialogOpen] = React.useState<boolean>(false);
   const [onHover, setOnHover] = React.useState<boolean>(false);
 
@@ -26,7 +24,7 @@ export const Task: React.FC<Props> = ({ mode, selected, ...task }) => {
   const updateTask = useMutation<UpdateTask["payload"], ServerError, { id: string; data: UpdateTask["body"] }>({
     mutationFn: ({ id, data }) => api.tasks.update(id, data),
     onSuccess: () => {
-      revalidateContext();
+      qc.invalidateQueries("currentDay");
       sfx.complete().play();
     },
     onError: () => {
@@ -37,7 +35,7 @@ export const Task: React.FC<Props> = ({ mode, selected, ...task }) => {
   const deleteTask = useMutation<DeleteTask["payload"], ServerError, string>({
     mutationFn: (id) => api.tasks.delete(id),
     onSuccess: () => {
-      revalidateContext();
+      qc.invalidateQueries("currentDay");
       sfx.delete().play();
     },
     onError: () => {

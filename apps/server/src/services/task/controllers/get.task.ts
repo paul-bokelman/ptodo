@@ -1,4 +1,4 @@
-import type { Controller, GetTask } from "prs-common";
+import type { Controller, GetTask } from "ptodo-common";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../../../config";
 import { formatResponse, handleControllerError } from "../../../lib/utils";

@@ -1,11 +1,10 @@
-import type { UpdateTask, ServerError } from "prs-common";
+import type { UpdateTask, ServerError } from "ptodo-common";
 import * as React from "react";
 import { useMutation } from "react-query";
 import { type SubmitHandler, type SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { schemas } from "prs-common";
-import { usePRS } from "@/components/prs-provider";
+import { schemas } from "ptodo-common";
 import { api } from "@/lib/api";
 import {
   useToast,
@@ -24,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui";
 import { Loader } from "lucide-react";
+import { qc } from "@/lib/api";
 
 interface Props {
   task: { id: string; description: string };
@@ -36,12 +36,14 @@ type FormValues = z.infer<typeof schema>;
 const schema = schemas.task.update.shape.body;
 
 export const UpdateTaskDialog: React.FC<Props> = ({ task, open, close }) => {
-  const { revalidateContext } = usePRS();
   const { toast } = useToast();
 
   const updateTask = useMutation<UpdateTask["payload"], ServerError, { id: string; data: UpdateTask["body"] }>({
     mutationFn: ({ id, data }) => api.tasks.update(id, data),
-    onSuccess: () => revalidateContext(),
+    onSuccess: () => {
+      qc.invalidateQueries("currentDay");
+      toast({ title: "Task updated" });
+    },
     onError: () => {
       toast({ title: "Failed to update task", variant: "destructive" });
     },

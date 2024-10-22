@@ -1,11 +1,11 @@
-import type { ServerError, CreateTask } from "prs-common";
+import type { ServerError, CreateTask } from "ptodo-common";
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
 import { useMutation } from "react-query";
 import { type SubmitHandler, type SubmitErrorHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { schemas } from "prs-common";
+import { schemas } from "ptodo-common";
 import {
   useToast,
   Dialog,
@@ -22,10 +22,9 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui";
-import { api } from "@/lib/api";
+import { qc, api } from "@/lib/api";
 import { sfx } from "@/lib/sfx";
 import dayjs from "dayjs";
-import { usePRS } from "..";
 import { Loader } from "lucide-react";
 
 interface Props {
@@ -39,13 +38,12 @@ const schema = schemas.task.create.shape.body;
 
 export const CreateTaskDialog: React.FC<Props> = ({ open, close }) => {
   const { toast } = useToast();
-  const { revalidateContext } = usePRS();
   const [params] = useSearchParams(location.search);
 
   const createTask = useMutation<CreateTask["payload"], ServerError, { data: CreateTask["body"] }>({
     mutationFn: ({ data }) => api.tasks.create(data),
     onSuccess: () => {
-      revalidateContext();
+      qc.invalidateQueries("currentDay");
       sfx.success.play();
     },
     onError: () => {

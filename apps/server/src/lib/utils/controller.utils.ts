@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { ControllerConfig, ServerError } from "prs-common";
+import type { ControllerConfig, ServerError } from "ptodo-common";
 import { Prisma } from "@prisma/client";
 import { StatusCodes, getReasonPhrase } from "http-status-codes";
 

@@ -1,5 +1,5 @@
 {
-  "name": "prs",
+  "name": "ptodo",
   "private": true,
   "workspaces": [
     "apps/*",

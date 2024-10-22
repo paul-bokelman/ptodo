@@ -23,7 +23,7 @@
     "clsx": "^2.0.0",
     "dayjs": "^1.11.10",
     "lucide-react": "^0.284.0",
-    "prs-common": "*",
+    "ptodo-common": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.47.0",

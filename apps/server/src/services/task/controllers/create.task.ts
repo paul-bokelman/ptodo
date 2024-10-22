@@ -1,8 +1,7 @@
-import type { Controller, CreateTask } from "prs-common";
+import type { Controller, CreateTask } from "ptodo-common";
 import { StatusCodes } from "http-status-codes";
 import dayjs from "dayjs";
 import { prisma } from "../../../config";
-import { context } from "../../../lib";
 import { formatResponse, handleControllerError } from "../../../lib/utils";
 
 export const createTask: Controller<CreateTask> = async (req, res) => {
@@ -22,7 +21,6 @@ export const createTask: Controller<CreateTask> = async (req, res) => {
         include: { day: true },
       });
 
-      await context.update((ctx) => ({ maxIndex: ctx.maxIndex + 1 }));
       return success(StatusCodes.OK, task);
     }
 
@@ -40,7 +38,6 @@ export const createTask: Controller<CreateTask> = async (req, res) => {
         include: { day: true },
       });
 
-      await context.update((ctx) => ({ maxIndex: ctx.maxIndex + 1 }));
       return success(StatusCodes.OK, task);
     }
 
@@ -49,7 +46,6 @@ export const createTask: Controller<CreateTask> = async (req, res) => {
       include: { day: true },
     });
 
-    await context.update((ctx) => ({ maxIndex: ctx.maxIndex + 1 }));
     return success(StatusCodes.OK, task);
   } catch (e) {
     return handleControllerError(e, res);

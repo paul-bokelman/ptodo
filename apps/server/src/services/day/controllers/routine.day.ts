@@ -1,4 +1,4 @@
-import type { Controller, ImportRoutine } from "prs-common";
+import type { Controller, ImportRoutine } from "ptodo-common";
 import fs from "fs";
 import path from "path";
 import { Day, Prisma, Task } from "@prisma/client";

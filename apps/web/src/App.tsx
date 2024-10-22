@@ -1,4 +1,4 @@
-import type { ImportRoutine, ServerError } from "prs-common";
+import type { ImportRoutine, ServerError } from "ptodo-common";
 import { TaskMode } from "@/types";
 import * as React from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -11,12 +11,10 @@ import { Button, Tabs, TabsList, TabsTrigger, useToast } from "@/components/ui";
 import { CreateTaskDialog } from "@/components/dialog";
 import { api, qc } from "@/lib/api";
 import { sfx } from "@/lib/sfx";
-import { usePRS, Countdown } from "@/components";
 
 interface Props {}
 
 const App: React.FC<Props> = () => {
-  const { online, currentTaskIndex, revalidateContext } = usePRS();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams(location.search);
@@ -30,7 +28,6 @@ const App: React.FC<Props> = () => {
   const importRoutine = useMutation<ImportRoutine["payload"], ServerError, string>({
     mutationFn: (id) => api.days.routine(id),
     onSuccess: () => {
-      revalidateContext();
       qc.invalidateQueries(["currentDay", date]);
       toast({ title: "Routine imported" });
     },
@@ -68,10 +65,7 @@ const App: React.FC<Props> = () => {
     <>
       <div className="relative w-screen h-screen flex flex-col gap-2 p-20">
         <div className="relative flex flex-col">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">Physical Reward System</h1>
-          <p className="leading-7 text-muted-foreground mt-4">
-            Here's everything you gotta do to stay on track. You got this! 🚀
-          </p>
+          <h1 className="scroll-m-20 text-sm text-muted-foreground tracking-tight">PAB - {date}</h1>
         </div>
 
         <div className="relative flex flex-col gap-4 mt-2">
@@ -123,7 +117,7 @@ const App: React.FC<Props> = () => {
               )}
               <div className="grid grid-cols-3 gap-1">
                 {day.tasks.map((task, i) => (
-                  <Task key={i} {...task} mode={taskMode} selected={online && currentTaskIndex === i} />
+                  <Task key={i} {...task} mode={taskMode} />
                 ))}
               </div>
             </>
@@ -134,12 +128,8 @@ const App: React.FC<Props> = () => {
           )}
         </div>
         <div className="absolute bottom-20 left-20 flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className={cn({ "bg-green-500": online, "bg-red-500": !online }, "h-2 w-2 rounded-full")} />
-            <p className="text-xs italic leading-7 text-muted-foreground">PRS system {online ? "online" : "offline"}</p>
-          </div>
           {day?.stats ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* this is kinda messy, should it be abstracted or just expanded? */}
               {[
                 `⚡️ ${day.stats.streak}`,
@@ -154,7 +144,6 @@ const App: React.FC<Props> = () => {
           ) : (
             <span className="text-xs text-muted-foreground">...</span>
           )}
-          <Countdown />
         </div>
       </div>
       <CreateTaskDialog open={createDialogOpen} close={closeCreateDialog} />
