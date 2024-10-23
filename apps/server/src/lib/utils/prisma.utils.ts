@@ -1,4 +1,7 @@
 import type { Day, Task } from "@prisma/client";
+import fs from "fs";
+import path from "path";
+import { load as loadYaml } from "js-yaml";
 import dayjs from "dayjs";
 import { prisma } from "../../config";
 
@@ -14,7 +17,25 @@ export const getDay = async (incomingDate: Date | string = new Date()): Promise<
     });
 
     if (!day) {
-      day = await prisma.day.create({ data: { date: date.toDate() }, include: { tasks: true } });
+      // load routine file
+      const routineFile = fs.readFileSync(path.resolve(__dirname, "../../../prisma/data/routine.yaml"), {
+        encoding: "utf-8",
+      });
+
+      const parsedRoutine = loadYaml(routineFile) as Record<string, string[]>;
+
+      // create day with routine tasks
+      day = await prisma.day.create({
+        data: {
+          date: date.toDate(),
+          tasks: {
+            createMany: {
+              data: parsedRoutine[date.format("dddd").toLowerCase()].map((task) => ({ description: task })),
+            },
+          },
+        },
+        include: { tasks: true },
+      });
     }
 
     day.tasks.sort((t1, t2) => {

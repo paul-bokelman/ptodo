@@ -5,5 +5,4 @@ import { validate } from "../../middleware";
 
 export const days = Router();
 
-days.post("/:id/routine", validate(schemas.day.routine), controllers.importRoutine);
 days.get("/", validate(schemas.day.get), controllers.getDay);

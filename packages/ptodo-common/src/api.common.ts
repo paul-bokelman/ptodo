@@ -14,14 +14,6 @@ export type GetDay = ToControllerConfig<
 
 const getDaySchema = z.object({ query: z.object({ date: z.string() }) });
 
-export type ImportRoutine = ToControllerConfig<typeof importRoutineSchema, Day & { tasks: Array<Task> }>;
-
-const importRoutineSchema = z.object({
-  params: z.object({
-    id: z.string(),
-  }),
-});
-
 /* ---------------------------------- TASKS --------------------------------- */
 
 export type GetTask = ToControllerConfig<typeof getTaskSchema, Task & { day: Day }>;
@@ -58,7 +50,7 @@ const createTaskSchema = z.object({
 /* --------------------------------- SCHEMAS -------------------------------- */
 
 export const schemas = {
-  day: { get: getDaySchema, routine: importRoutineSchema },
+  day: { get: getDaySchema },
   task: {
     get: getTaskSchema,
     update: updateTaskSchema,
