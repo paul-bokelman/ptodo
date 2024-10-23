@@ -42,7 +42,6 @@ export const UpdateTaskDialog: React.FC<Props> = ({ task, open, close }) => {
     mutationFn: ({ id, data }) => api.tasks.update(id, data),
     onSuccess: () => {
       qc.invalidateQueries("currentDay");
-      toast({ title: "Task updated" });
     },
     onError: () => {
       toast({ title: "Failed to update task", variant: "destructive" });
