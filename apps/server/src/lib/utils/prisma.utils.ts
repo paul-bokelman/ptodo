@@ -38,16 +38,34 @@ export const getDay = async (incomingDate: Date | string = new Date()): Promise<
       });
     }
 
+    // negative -> left
     day.tasks.sort((t1, t2) => {
-      // should this be in controller?
-      if (t1.complete) return 1;
-      if (t2.complete) return -1;
-      return 0;
+      // no times set -> check completions
+      if (!t1.timeEnd && !t2.timeEnd) {
+        if (t1.complete) return 1;
+        if (t2.complete) return -1;
+
+        return 0;
+      }
+
+      // t1 has time and t2 doesn't -> t1 priority
+      if (t1.timeEnd && !t2.timeEnd) {
+        return -1;
+      }
+
+      // t2 has time and t1 doesn't -> t2 priority
+      if (!t1.timeEnd && t2.timeEnd) {
+        return 1;
+      }
+
+      // compare hours
+      return parseInt(t1.timeEnd!.split(":")[0]) - parseInt(t2.timeEnd!.split(":")[0]);
     });
 
     return day;
   } catch (e) {
-    throw new Error("Failed to get current day.");
+    console.log(e);
+    throw new Error("Failed to get current day");
   }
 };
 

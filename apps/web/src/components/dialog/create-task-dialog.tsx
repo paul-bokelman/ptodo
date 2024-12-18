@@ -89,7 +89,7 @@ export const CreateTaskDialog: React.FC<Props> = ({ open, close }) => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="math hw" {...field} />
+                      <Input placeholder="math: study" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

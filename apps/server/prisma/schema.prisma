@@ -11,17 +11,12 @@ model Task {
   id          String   @id @default(cuid())
   description String
   complete    Boolean  @default(false)
+  timeStart   String?
+  timeEnd     String?
   dayId       String
-  day         Day      @relation(fields: [dayId], references: [id]) //! A task should always have a day!
+  day         Day      @relation(fields: [dayId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-}
-
-model Tag {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Day {

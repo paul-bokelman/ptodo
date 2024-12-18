@@ -10,7 +10,24 @@ export const updateTask: Controller<UpdateTask> = async (req, res) => {
     const task = await prisma.task.findUnique({ where: { id: req.params.id } });
     if (!task) return error(StatusCodes.BAD_REQUEST, "No task associated with that ID");
 
-    const updatedTask = await prisma.task.update({ where: { id: req.params.id }, data: req.body });
+    const { time = undefined, ...rest } = req.body;
+    let timeStart: string | null = task.timeStart;
+    let timeEnd: string | null = task.timeEnd;
+
+    if (time) {
+      let [rawTimeStart, rawTimeEnd] = time.split("-");
+      timeStart = rawTimeStart;
+      timeEnd = rawTimeEnd;
+    }
+
+    const updatedTask = await prisma.task.update({
+      where: { id: req.params.id },
+      data: {
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        ...rest,
+      },
+    });
 
     return success(StatusCodes.OK, updatedTask);
   } catch (e) {

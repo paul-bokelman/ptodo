@@ -4,20 +4,22 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "react-query";
 import cn from "clsx";
 import dayjs from "dayjs";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
-import { Task } from "@/components";
+import { Plus, ChevronLeft, ChevronRight, CalendarClock, ClipboardList } from "lucide-react";
+import { Tasks, TimeBlock } from "@/components";
 import { Button, Tabs, TabsList, TabsTrigger } from "@/components/ui";
 import { CreateTaskDialog } from "@/components/dialog";
 import { api, qc } from "@/lib/api";
 import { sfx } from "@/lib/sfx";
+import { useTask } from "@/components/context";
 
 interface Props {}
 
 const App: React.FC<Props> = () => {
   const navigate = useNavigate();
+  const { mode, setMode } = useTask();
   const [params] = useSearchParams(location.search);
-  const [taskMode, setTaskMode] = React.useState<TaskMode>(TaskMode.DEFAULT);
   const [createDialogOpen, setCreateDialogOpen] = React.useState<boolean>(false);
+  const [viewMode, setViewMode] = React.useState<"list" | "time">("list");
 
   const date = params.get("date");
 
@@ -25,10 +27,10 @@ const App: React.FC<Props> = () => {
 
   const closeCreateDialog = () => setCreateDialogOpen(false);
 
-  const changeTaskMode = (mode: string) => {
-    const currentMode = TaskMode[mode.toUpperCase() as keyof typeof TaskMode];
-    if (currentMode === taskMode) return;
-    setTaskMode(currentMode);
+  const changeTaskMode = (incomingMode: string) => {
+    const currentMode = TaskMode[incomingMode.toUpperCase() as keyof typeof TaskMode];
+    if (currentMode === mode) return;
+    setMode(currentMode);
     sfx.click.play();
   };
 
@@ -42,12 +44,30 @@ const App: React.FC<Props> = () => {
     qc.invalidateQueries(["currentDay", date]);
   };
 
+  const cycleViewMode = () => {
+    const views = ["list", "time"] as const;
+    const currentIndex = views.indexOf(viewMode);
+    const nextIndex = (currentIndex + 1) % views.length;
+    setViewMode(views[nextIndex]);
+    params.set("view", views[nextIndex]);
+    navigate(`/?${params.toString()}`);
+  };
+
   React.useEffect(() => {
     if (params.get("date") === null) {
       params.set("date", dayjs().format("YYYY-MM-DD"));
     }
     navigate(`/?${params.toString()}`);
   }, [navigate, params]);
+
+  React.useEffect(() => {
+    const persistedViewParam = params.get("view");
+    if (!persistedViewParam || !["list", "time"].includes(persistedViewParam)) {
+      params.set("view", "list");
+    } else {
+      setViewMode(persistedViewParam as "list" | "time");
+    }
+  }, [params]);
 
   return (
     <>
@@ -85,6 +105,11 @@ const App: React.FC<Props> = () => {
                 <TabsTrigger value="delete">Delete</TabsTrigger>
               </TabsList>
             </Tabs>
+
+            <Button variant="outline" size="icon" onClick={cycleViewMode}>
+              {viewMode === "list" ? <ClipboardList className="h-4 w-4" /> : <CalendarClock className="h-4 w-4" />}
+            </Button>
+
             <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" onClick={() => changeQueryDate("decrement")}>
                 <ChevronLeft className="h-4 w-4" />
@@ -99,12 +124,13 @@ const App: React.FC<Props> = () => {
           </div>
           {status === "success" ? (
             <>
-              {!day.tasks.length && <span className="text-xs text-muted-foreground">No tasks found, create some!</span>}
-              <div className="grid md:grid-cols-3 gap-1">
-                {day.tasks.map((task, i) => (
-                  <Task key={i} {...task} mode={taskMode} />
-                ))}
-              </div>
+              {!day.tasks.length ? (
+                <span className="text-xs text-muted-foreground">No tasks found, create some!</span>
+              ) : viewMode === "time" ? (
+                <TimeBlock tasks={day.tasks} />
+              ) : (
+                <Tasks tasks={day.tasks} />
+              )}
             </>
           ) : (
             <span className={cn({ "text-red-500": status === "error" }, "mt-2 ml-2 text-xs text-muted-foreground")}>

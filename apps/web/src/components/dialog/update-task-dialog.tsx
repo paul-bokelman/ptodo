@@ -1,4 +1,4 @@
-import type { UpdateTask, ServerError } from "ptodo-common";
+import type { UpdateTask, ServerError, GetDay } from "ptodo-common";
 import * as React from "react";
 import { useMutation } from "react-query";
 import { type SubmitHandler, type SubmitErrorHandler, useForm } from "react-hook-form";
@@ -26,7 +26,7 @@ import { Loader } from "lucide-react";
 import { qc } from "@/lib/api";
 
 interface Props {
-  task: { id: string; description: string };
+  task: GetDay["payload"]["tasks"][number];
   open: boolean;
   close: () => void;
 }
@@ -65,6 +65,10 @@ export const UpdateTaskDialog: React.FC<Props> = ({ task, open, close }) => {
   // hate this block...
   React.useEffect(() => {
     form.setValue("description", task.description);
+
+    if (task.timeStart && task.timeEnd) {
+      form.setValue("time", `${task.timeStart}-${task.timeEnd}`);
+    }
   }, [form, task]);
 
   return (
@@ -85,6 +89,20 @@ export const UpdateTaskDialog: React.FC<Props> = ({ task, open, close }) => {
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Input placeholder={task.description} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="time"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Time</FormLabel>
+                    <FormControl>
+                      <Input placeholder="12:00-13:00" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

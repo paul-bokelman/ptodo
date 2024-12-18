@@ -25,12 +25,30 @@ const updateTaskSchema = z.object({
   body: z
     .object({
       description: z.string().max(50, "Cannot exceed 50 characters").min(3, "Cannot be less than 3 characters"),
+      time: z
+        .string()
+        .max(11, "Time cannot exceed 11 characters")
+        .refine(
+          (time) => {
+            if (time.length == 0) {
+              return true;
+            }
+
+            if (!time.includes("-") || !time.includes(":") || time.split(":").length != 3) {
+              return false;
+            }
+
+            return true;
+          },
+          { message: "Time must be in format hh:mm-hh:mm" }
+        ),
       complete: z.boolean(),
       dayId: z.string(),
     })
     .partial()
     .refine(
-      ({ description, complete, dayId }) => description !== undefined || complete !== undefined || dayId !== undefined,
+      ({ description, complete, dayId, time }) =>
+        description !== undefined || complete !== undefined || dayId !== undefined || time !== undefined,
       { message: "One of the fields must be defined" }
     ),
 });
