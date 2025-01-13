@@ -22,7 +22,7 @@ export const getDay = async (incomingDate: Date | string = new Date()): Promise<
         encoding: "utf-8",
       });
 
-      const parsedRoutine = loadYaml(routineFile) as Record<string, string[]>;
+      const parsedRoutine = loadYaml(routineFile) as Record<string, Array<Array<string>>>;
 
       // create day with routine tasks
       day = await prisma.day.create({
@@ -30,7 +30,11 @@ export const getDay = async (incomingDate: Date | string = new Date()): Promise<
           date: date.toDate(),
           tasks: {
             createMany: {
-              data: parsedRoutine[date.format("dddd").toLowerCase()].map((task) => ({ description: task })),
+              data: parsedRoutine[date.format("dddd").toLowerCase()].map((task) => ({
+                description: task[0],
+                timeStart: task.length > 1 ? task[1].split("-")[0] : null,
+                timeEnd: task.length > 1 ? task[1].split("-")[1] : null,
+              })),
             },
           },
         },
