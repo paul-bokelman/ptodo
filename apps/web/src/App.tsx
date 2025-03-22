@@ -81,6 +81,7 @@ const App: React.FC<Props> = () => {
                 `⚡️ ${day.stats.streak}`,
                 `🏆 ${day.stats.totalCompleted}`,
                 `${day.stats.ratio.incline ? "📈" : "📉"} ${day.stats.ratio.value}`,
+                `🎯 FOLLOW THROUGH`,
               ].map((value) => (
                 <span key={value} className="text-xs leading-7 text-muted-foreground">
                   {value}
